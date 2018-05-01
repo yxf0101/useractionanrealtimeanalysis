@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<!--
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License. See accompanying LICENSE file.
+-->
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+
+<!--执行hdfs的nameservice为ns,和core-site.xml保持一致-->
+<property>
+	<name>dfs.nameservices</name>
+	<value>ns</value>
+</property>
+<!--ns下有两个namenode,分别是nn1,nn2-->
+<property>
+	<name>dfs.ha.namenodes.ns</name>
+	<value>nn1,nn2</value>
+</property>
+
+<!--nn1的RPC通信地址-->
+<property>
+	<name>dfs.namenode.rpc-address.ns.nn1</name>
+	<value>mot1:9000</value>
+</property>
+
+<!--nn1的http通信地址-->
+<property>
+<name>dfs.namenode.http-address.ns.nn1</name>
+<value>mot1:50070</value>
+</property>
+
+<!--nn2的RPC通信地址-->
+<property>
+<name>dfs.namenode.rpc-address.ns.nn2</name>
+<value>mot2:9000</value>
+</property>
+<!--nn2的http通信地址-->
+<property>
+<name>dfs.namenode.http-address.ns.nn2</name>
+<value>mot2:50070</value>
+</property>
+<!--指定namenode的元数据在JournalNode上的存放位置,这样，namenode2可以
+从jn集群里获取
+最新的namenode的信息，达到热备的效果-->
+<property>
+<name>dfs.namenode.shared.edits.dir</name>
+<value>
+qjournal://mot2:8485;mot3:8485;mot4:8485/ns</value>
+</property>
+<!--指定JournalNode存放数据的位置-->
+<property>
+<name>dfs.journalnode.edits.dir</name>
+<value>/srv/hadoop-2.7.4/journal</value>
+</property>
+
+<!--开启namenode故障时自动切换-->
+<property>
+<name>dfs.ha.automatic-failover.enabled</name>
+<value>true</value>
+</property>
+<!--配置切换的实现方式-->
+<property>
+<name>dfs.client.failover.proxy.provider.ns</name>
+<value>org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider</value>
+</property>
+
+<!--配置隔离机制-->
+<property>
+<name>dfs.ha.fencing.methods</name>
+<value>sshfence</value>
+</property>
+<!--配置隔离机制的ssh登录秘钥所在的位置-->
+<property>
+<name>dfs.ha.fencing.ssh.private-key-files</name>
+<value>/root/.ssh/id_rsa</value>
+</property>
+<!--配置namenode数据存放的位置,可以不配置，如果不配置，默认用的是
+core-site.xml里配置的hadoop.tmp.dir的路径-->
+<property>
+<name>dfs.namenode.name.dir</name>
+<value>/srv/hadoop-2.7.4/tmp/namenode</value>
+</property>
+<!--配置datanode数据存放的位置,可以不配置，如果不配置，默认用的是
+core-site.xml里配置的hadoop.tmp.dir的路径-->
+<property>
+<name>dfs.datanode.data.dir</name>
+<value>/srv/hadoop-2.7.4/tmp/datanode</value>
+</property>
+<!--配置block副本数量-->
+<property>
+<name>dfs.replication</name>
+<value>3</value>
+</property>
+<!--设置hdfs的操作权限，false表示任何用户都可以在hdfs上操作文件-->
+<property>
+<name>dfs.permissions</name>
+<value>false</value>
+</property>
+
+
+<!--  kms_wdd  -->
+
+<property>
+     <name>dfs.encryption.key.provider.uri</name>
+     <value>kms://http@mot1:16100/kms</value>
+</property>
+
+</configuration>
